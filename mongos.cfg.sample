@@ -1,0 +1,32 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: systemLog_path  #修改此目录
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath:  processManagement_pidFilePath #修改此目录
+  timeZoneInfo: /usr/share/zoneinfo
+
+# network interfaces
+net:
+  port: net_port
+  bindIp: 0.0.0.0  # 修改监听的地址，
+
+
+
+sharding:
+  configDB:  sharding_configDB  #configsvr的链接地址
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:

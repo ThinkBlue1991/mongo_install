@@ -1,0 +1,46 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: systemLog_path #修改此目录
+
+# Where and how to store data.
+storage:
+  dbPath: storage_dbPath  #修改此目录
+  journal:
+    enabled: true
+#  engine:
+#  wiredTiger:
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: processManagement_pidFilePath  #修改此目录
+  timeZoneInfo: /usr/share/zoneinfo
+
+# network interfaces
+net:
+  port: net_port  #修改此端口
+  bindIp: 0.0.0.0  # 修改监听的地址，如果是公网环境下，
+
+
+#security:
+
+#operationProfiling:
+
+replication:
+  replSetName: "replconfig"  # 副本集的名字，副本集里的副本名字需要一致
+
+sharding:
+  clusterRole: configsvr
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:

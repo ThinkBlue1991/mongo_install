@@ -1,0 +1,52 @@
+# mongod.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: systemLog_path #修改此目录
+  logRotate: rename
+
+# Where and how to store data.
+storage:
+  dbPath: storage_dbPath #修改此目录
+  journal:
+    enabled: true
+    commitIntervalMs: 500
+  engine: wiredTiger
+  wiredTiger:
+    engineConfig:
+      cacheSizeGB: wiredTiger_engineConfig_cacheSizeGB
+      directoryForIndexes: true
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: processManagement_pidFilePath  # location of pidfile  #修改此目录
+  timeZoneInfo: /usr/share/zoneinfo
+
+# network interfaces
+net:
+  port: net_port #修改此端口
+  bindIp: 0.0.0.0  # 修改监听的地址，
+
+
+#security:
+
+#operationProfiling:
+
+replication:
+  replSetName: replication_replSetName  # 副本集的名字，副本集里的副本名字需要一致。现在是单副本的，这里都配成不一样的就行
+  oplogSizeMB: 10000
+
+sharding:
+  clusterRole: shardsvr
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:
