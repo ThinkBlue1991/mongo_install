@@ -12,7 +12,8 @@ INFO_LEVEL = {'INFO': 'INFO', 'DEBUG': 'DEBUG', 'ERROR': 'ERROR'}
 def logging(level, msg):
     """
     记录错误信息的函数
-    :param msg: 错误信息
+    :param level: str,日志的级别
+    :param msg: str,日志信息
     :return:
     """
     base_dir = os.getcwd()
@@ -25,6 +26,13 @@ def logging(level, msg):
 
 
 def gen_config(json_config, prefix, PWD='./'):
+    """
+    生成配置文件
+    :param json_config: dict,配置的json格式
+    :param prefix: str,配置文件前缀
+    :param PWD: str,配置文件所在的路径
+    :return:
+    """
     for item in json_config[prefix]:
         dest = os.path.join(PWD, '{0}_{1}_{2}.config'.format(prefix, item["IP"], item["role"]))
         src = os.path.join(PWD, '{0}.cfg.sample'.format(prefix))
@@ -53,6 +61,12 @@ def gen_config(json_config, prefix, PWD='./'):
 
 
 def release_mongod_tasks(json_config, PWD='./'):
+    """
+    启动mongod进程
+    :param json_config: dict,配置信息
+    :param PWD:str,配置文件所在的路径
+    :return:
+    """
     try:
         # 启动configsvr
         print("******************************开始启动config进程******************************")
@@ -101,6 +115,12 @@ def release_mongod_tasks(json_config, PWD='./'):
 
 
 def release_mongos_tasks(json_config, PWD='./'):
+    """
+    启动mongos进程
+    :param json_config: dict,配置信息
+    :param PWD:str,配置文件所在的路径
+    :return:
+    """
     try:
         # 启动mongos
         print("******************************开始启动mongos进程******************************")
@@ -126,6 +146,11 @@ def release_mongos_tasks(json_config, PWD='./'):
 
 
 def init_configsrv(json_config):
+    """
+    初始化config server进程
+    :param json_config: dict,配置信息
+    :return:
+    """
     try:
         msg = 'rs.initiate({_id:"replconfig",configsvr:true,members:'
         count = 0
@@ -143,6 +168,11 @@ def init_configsrv(json_config):
 
 
 def init_shards(json_config):
+    """
+    初始化shard server进程
+    :param json_config: dict,配置信息
+    :return:
+    """
     try:
         msg_list = list()
         for shard in json_config["shardsvr"]:
@@ -158,6 +188,11 @@ def init_shards(json_config):
 
 
 def init_mongos(json_config):
+    """
+    汇总shard信息，组合addshard的信息
+    :param json_config: dict,配置信息
+    :return:
+    """
     try:
         msg_list = list()
         for shard in json_config["shardsvr"]:
@@ -172,6 +207,11 @@ def init_mongos(json_config):
 
 
 def init_mongod(json_config):
+    """
+    初始化mongo进程，包括config server,shard server,mongos server
+    :param json_config: dict,配置信息
+    :return:
+    """
     try:
         print("******************************开始初始化config节点******************************")
         confidsvr_command = init_configsrv(json_config=json_config)
@@ -208,6 +248,11 @@ def init_mongod(json_config):
 
 
 def add_shards(json_config):
+    """
+    向mongos进程中添加shard信息
+    :param json_config: dict,配置信息
+    :return:
+    """
     try:
         print("******************************开始向mongos中添加shard******************************")
         mongos_command = init_mongos(json_config=json_config)

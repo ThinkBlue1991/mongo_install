@@ -17,7 +17,8 @@ INFO_LEVEL = {'INFO': 'INFO', 'ERROR': 'ERROR'}
 def logging(level, msg):
     """
     记录错误信息的函数
-    :param msg: 错误信息
+    :param level: str,日志级别
+    :param msg: str,日志信息
     :return:
     """
     base_dir = os.getcwd()
@@ -32,9 +33,9 @@ def logging(level, msg):
 def ssh_connect(ip, user='root', password=None):
     """
     使用 ssh 连接服务器
-    :param ip: 目标服务器的ip地址
-    :param user: 一般ssh免密登录使用的是 root 用户
-    :param password: 目标服务器的密码，我们统一放入列表中
+    :param ip: str,目标服务器的ip地址
+    :param user: str,一般ssh免密登录使用的是 root 用户
+    :param password: str,目标服务器的密码，我们统一放入列表中
     :return:
     """
     if password:
@@ -49,6 +50,11 @@ def ssh_connect(ip, user='root', password=None):
 
 
 def parser_ssh_file(hostfile="./hostfile"):
+    """
+    解析配置文件信息
+    :param hostfile: str, 配置文件路径
+    :return:
+    """
     nodes_info = []
     with open(hostfile, "rb+") as file:
         for line in file:
@@ -64,8 +70,9 @@ def parser_ssh_file(hostfile="./hostfile"):
 
 
 def gen_master_ssh_key(master_node):
-    """生成秘钥
-    :param master_node: 主服务器的ip+password
+    """
+    生成秘钥
+    :param master_node: dict,主服务器的ip+password
     :return:
     """
     host, SUCCESS = ssh_connect(master_node["ip"], password=master_node["password"])
@@ -109,7 +116,7 @@ def gen_master_ssh_key(master_node):
 def ssh_to_other(nodes_info):
     """
     把生成的证书分发给下面的免密的服务器
-    :param nodes_info: 节点列表
+    :param nodes_info: list,节点列表
     :return:
     """
     logging("INFO", "开始证书文件分发...")
@@ -152,8 +159,7 @@ def ssh_to_other(nodes_info):
 def check_ssh_login(nodes_info):
     """
     测试免密登录是否实现的函数
-    :param master: 主服务器
-    :param nodes: 节点服务器
+    :param nodes_info: list,节点服务器
     :return:
     """
     for master in nodes_info:
@@ -182,6 +188,11 @@ def check_ssh_login(nodes_info):
 
 
 def ssh_server(hostfile):
+    """
+    ssh server 入口
+    :param hostfile: str,配置文件路径
+    :return:
+    """
     nodes_info = parser_ssh_file(hostfile=hostfile)
 
     logging("INFO", "共有{}个节点参与此次配置".format(len(nodes_info)))
