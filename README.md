@@ -58,6 +58,9 @@ mongos服务的配置样本
 ### 开始
 ```shell script
 
+# 安装依赖
+pip3 install -r requirement.txt
+
 python3 run_ssh_server.py -f hostfile
 
 # 上一步执行成功之后，才执行下一步
