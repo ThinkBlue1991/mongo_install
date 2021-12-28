@@ -65,7 +65,13 @@ python3 run_ssh_server.py -f hostfile
 
 # 上一步执行成功之后，才执行下一步
 
-python3 run_mongo_server.py
+python3 run_mongo_server.py -f config.json create
+python3 run_mongo_server.py -f config.json start
+```
+
+### 关闭服务
+```shell script
+python3 run_mongo_server.py -f config.json stop
 ```
 ### 其他
 
