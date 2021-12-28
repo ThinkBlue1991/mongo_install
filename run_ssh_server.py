@@ -210,7 +210,7 @@ def ssh_server(hostfile):
 
 if __name__ == '__main__':
     try:
-        parser = argparse.ArgumentParser(prog="parser", usage="%(prog)s [options]",
+        parser = argparse.ArgumentParser(prog="run_ssh_server", usage="%(prog)s [options]",
                                          description="parser ssh configure file",
                                          epilog="epilog")
         parser.add_argument("-f", "--file", action="store", dest="file_path", help="hostfile path")

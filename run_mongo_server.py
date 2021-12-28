@@ -1,12 +1,43 @@
+import argparse
 import os
 import json
 import subprocess
+import sys
 from datetime import datetime
 
 # 日志文件
+
 FILE_NAME = 'mongodb-{}.log'.format(datetime.now().strftime('%Y-%m-%d'))
 
 INFO_LEVEL = {'INFO': 'INFO', 'DEBUG': 'DEBUG', 'ERROR': 'ERROR'}
+
+PWD = os.getcwd()
+
+
+def parser():
+    """
+    脚本参数解析
+    create：生成配置文件
+    start： 启动服务
+    stop： 关闭服务
+    :return:
+    """
+    argument = argparse.ArgumentParser(prog="run_mongo_server", usage="%(prog)s [options]",
+                                       description="TOOL ABOUT MONGODB SHARDING CLUSTER")
+    argument.add_argument("-f", "--file", action="store", dest="file_path", help="config file path")
+    sp = argument.add_subparsers()
+    sp_create = sp.add_parser('create', help='create %(prog)s daemon')
+    sp_stop = sp.add_parser('stop', help='stop %(prog)s daemon')
+    sp_start = sp.add_parser('start', help='start %(prog)s daemon')
+
+    sp_create.set_defaults(func=create)
+    sp_stop.set_defaults(func=stop)
+    sp_start.set_defaults(func=start)
+
+    args = argument.parse_args(sys.argv[1:])
+    args.func(args)
+
+    return args
 
 
 def logging(level, msg):
@@ -25,12 +56,11 @@ def logging(level, msg):
     subprocess.check_call(command, shell=True)
 
 
-def gen_config(json_config, prefix, PWD='./'):
+def gen_config(json_config, prefix):
     """
     生成配置文件
     :param json_config: dict,配置的json格式
     :param prefix: str,配置文件前缀
-    :param PWD: str,配置文件所在的路径
     :return:
     """
     for item in json_config[prefix]:
@@ -60,11 +90,10 @@ def gen_config(json_config, prefix, PWD='./'):
                         config_file.write(line)
 
 
-def release_mongod_tasks(json_config, PWD='./'):
+def release_mongod_tasks(json_config):
     """
     启动mongod进程
     :param json_config: dict,配置信息
-    :param PWD:str,配置文件所在的路径
     :return:
     """
     try:
@@ -117,7 +146,7 @@ def release_mongod_tasks(json_config, PWD='./'):
         raise
 
 
-def release_mongos_tasks(json_config, PWD='./'):
+def release_mongos_tasks(json_config):
     """
     启动mongos进程
     :param json_config: dict,配置信息
@@ -275,30 +304,60 @@ def add_shards(json_config):
         raise
 
 
-def read_config(config):
-    with open(config, 'r') as jsonfile:
-        json_config = json.load(jsonfile)
-    return json_config
+def read_config(func):
+    def wrapper(*args, **kwargs):
+        config = args[0].file_path
+        with open(config, 'r') as jsonfile:
+            json_config = json.load(jsonfile)
+        func(json_config=json_config)
+
+    return wrapper
+
+
+@read_config
+def create(json_config):
+    print("******************************开始生成配置文件******************************")
+    gen_config(json_config=json_config, prefix='configsvr')
+    gen_config(json_config=json_config, prefix='shardsvr')
+    gen_config(json_config=json_config, prefix='mongos')
+    print("******************************配置文件生成成功******************************")
+
+
+@read_config
+def stop(json_config):
+    print("******************************开始关闭服务******************************")
+
+    ips = set()
+    for key in json_config:
+        for item in json_config[key]:
+            ips.add(item["IP"])
+
+    for ip in ips:
+        stop_mongod_cmd = "ssh {0} ".format(
+            ip) + " \"ps -ef | grep 'mongod --config' | grep -v grep | awk -F ' ' '{print \$2}' | xargs kill -9 ||:\""
+        stop_mongos_cmd = "ssh {0} ".format(
+            ip) + " \"ps -ef | grep 'mongos --config' | grep -v grep | awk -F ' ' '{print \$2}' | xargs kill -9 ||:\""
+        print(stop_mongod_cmd)
+        print(stop_mongos_cmd)
+        subprocess.check_call(stop_mongod_cmd, shell=True, stderr=False)
+        subprocess.check_call(stop_mongos_cmd, shell=True, stderr=False)
+
+    print("******************************服务关闭成功******************************")
+
+
+@read_config
+def start(json_config):
+    # 启动config和shard进程
+    print("******************************开始启动和初始化服务******************************")
+    if release_mongod_tasks(json_config=json_config) and init_mongod(json_config=json_config):
+        # 启动mongos进程
+        if release_mongos_tasks(json_config=json_config) and add_shards(json_config=json_config):
+            print("******************************SUCCESS******************************")
 
 
 if __name__ == '__main__':
     try:
-        PWD = os.getcwd()
-        config = './config.json'
-        json_config = read_config(config=config)
-
-        print("******************************开始生成配置文件******************************")
-        gen_config(json_config=json_config, PWD=PWD, prefix='configsvr')
-        gen_config(json_config=json_config, PWD=PWD, prefix='shardsvr')
-        gen_config(json_config=json_config, PWD=PWD, prefix='mongos')
-        print("******************************配置文件生成成功******************************")
-
-        # 启动config和shard进程
-        print("******************************开始启动和初始化服务******************************")
-        if release_mongod_tasks(json_config=json_config, PWD=PWD) and init_mongod(json_config=json_config):
-            # 启动mongos进程
-            if release_mongos_tasks(json_config=json_config, PWD=PWD) and add_shards(json_config=json_config):
-                print("******************************SUCCESS******************************")
+        parser()
     except Exception as error:
         logging("ERROR", "mongodb 构建失败,进行回滚: {0}".format(error))
         print("******************************FAILED******************************")
