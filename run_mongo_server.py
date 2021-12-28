@@ -102,7 +102,10 @@ def release_mongod_tasks(json_config, PWD='./'):
             subprocess.check_call(mkdir_command, shell=True)
 
             up_command = 'ssh {0} "systemctl stop mongod; mongod --config {1}"'.format(task["IP"],
-                                   os.path.join(PWD,'shardsvr_{0}_{1}.config'.format(task["IP"], task["role"])))
+                                                                                       os.path.join(PWD,
+                                                                                                    'shardsvr_{0}_{1}.config'.format(
+                                                                                                        task["IP"],
+                                                                                                        task["role"])))
 
             logging("DEBUG", "release_mongod_tasks--启动shard进程--{}".format(up_command))
             subprocess.check_call(up_command, shell=True)
@@ -272,13 +275,17 @@ def add_shards(json_config):
         raise
 
 
+def read_config(config):
+    with open(config, 'r') as jsonfile:
+        json_config = json.load(jsonfile)
+    return json_config
+
+
 if __name__ == '__main__':
     try:
-        config = './config.json'
         PWD = os.getcwd()
-
-        with open(config, 'r') as jsonfile:
-            json_config = json.load(jsonfile)
+        config = './config.json'
+        json_config = read_config(config=config)
 
         print("******************************开始生成配置文件******************************")
         gen_config(json_config=json_config, PWD=PWD, prefix='configsvr')
