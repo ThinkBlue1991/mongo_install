@@ -45,7 +45,7 @@
         "systemLog_path": "/data/volume1/mongo/shard1/mongod.log",
         "storage_dbPath": "/data/volume1/mongo/shard1/data",
         "processManagement_pidFilePath": "/data/volume1/mongo/shard1/mongod.pid",
-        "replication_replSetName": "shardreplica01",
+        "replication_replSetName": "shardreplica03",
         "wiredTiger_engineConfig_cacheSizeGB": 8,
         "net_port": 27017
     }, {
@@ -54,7 +54,7 @@
         "systemLog_path": "/data/volume1/mongo/shard2/mongod.log",
         "storage_dbPath": "/data/volume1/mongo/shard2/data",
         "processManagement_pidFilePath": "/data/volume1/mongo/shard2/mongod.pid",
-        "replication_replSetName": "shardreplica02",
+        "replication_replSetName": "shardreplica04",
         "wiredTiger_engineConfig_cacheSizeGB": 8,
         "net_port": 27018
     }, {
@@ -63,7 +63,7 @@
         "systemLog_path": "/data/volume1/mongo/shard1/mongod.log",
         "storage_dbPath": "/data/volume1/mongo/shard1/data",
         "processManagement_pidFilePath": "/data/volume1/mongo/shard1/mongod.pid",
-        "replication_replSetName": "shardreplica01",
+        "replication_replSetName": "shardreplica05",
         "wiredTiger_engineConfig_cacheSizeGB": 8,
         "net_port": 27017
     }, {
@@ -72,7 +72,7 @@
         "systemLog_path": "/data/volume1/mongo/shard2/mongod.log",
         "storage_dbPath": "/data/volume1/mongo/shard2/data",
         "processManagement_pidFilePath": "/data/volume1/mongo/shard2/mongod.pid",
-        "replication_replSetName": "shardreplica02",
+        "replication_replSetName": "shardreplica06",
         "wiredTiger_engineConfig_cacheSizeGB": 8,
         "net_port": 27018
     }],
